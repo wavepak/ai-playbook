@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent & Analytics Best Practice Playbook</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+  :root {
+    --sidebar-width: 260px;
+    --header-height: 48px;
+    --bg: #f0f4f8;
+    --sidebar-bg: #071D49;
+    --sidebar-text: #c8d8f0;
+    --sidebar-hover: #0d2d6b;
+    --sidebar-active: #00B5E2;
+    --sidebar-active-bg: #0a2560;
+    --content-bg: #ffffff;
+    --border: #d6e4f0;
+    --text: #071D49;
+    --muted: #5a6e8a;
+    --accent: #005EB8;
+    --code-bg: #f0f6fb;
+    --code-border: #c8ddf0;
+    --h1-color: #071D49;
+    --h2-color: #071D49;
+    --h3-color: #005EB8;
+    --link-color: #005EB8;
+    --table-header: #e0f4fb;
+    --table-border: #99ddf2;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ── Top bar ── */
+  header {
+    height: var(--header-height);
+    background: #071D49;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 12px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,.25);
+    z-index: 100;
+  }
+  header svg { flex-shrink: 0; }
+  header span { font-size: 15px; font-weight: 600; letter-spacing: .3px; }
+
+  /* ── Body layout ── */
+  .layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── Sidebar ── */
+  aside {
+    width: var(--sidebar-width);
+    background: var(--sidebar-bg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex-shrink: 0;
+    border-right: 1px solid #0d2d6b;
+    transition: width .2s ease;
+  }
+  aside.collapsed { width: 0; }
+
+  .sidebar-header {
+    padding: 12px 14px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #7a9cc0;
+    border-bottom: 1px solid #0d2d6b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  #toc {
+    overflow-y: auto;
+    flex: 1;
+    padding: 8px 0;
+  }
+  #toc::-webkit-scrollbar { width: 4px; }
+  #toc::-webkit-scrollbar-thumb { background: #1a4080; border-radius: 2px; }
+
+  .toc-item {
+    display: block;
+    padding: 5px 14px;
+    cursor: pointer;
+    color: var(--sidebar-text);
+    font-size: 13px;
+    line-height: 1.4;
+    border-left: 3px solid transparent;
+    transition: background .12s, color .12s, border-color .12s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-decoration: none;
+  }
+  .toc-item:hover { background: var(--sidebar-hover); color: #fff; }
+  .toc-item.active {
+    background: var(--sidebar-active-bg);
+    color: var(--sidebar-active);
+    border-left-color: var(--sidebar-active);
+    font-weight: 600;
+  }
+  .toc-h1 { font-size: 13px; font-weight: 700; color: #00B5E2; padding-left: 14px; }
+  .toc-h2 { font-size: 13px; padding-left: 14px; font-weight: 600; }
+  .toc-h3 { font-size: 12px; padding-left: 20px; color: #8ab8d8; }
+  .toc-h4 { font-size: 11px; padding-left: 38px; color: #6a9ab8; }
+  .toc-h3::before {
+    content: '▶';
+    font-size: 8px;
+    display: inline-block;
+    margin-right: 5px;
+    transition: transform .18s ease;
+    opacity: .7;
+  }
+  .toc-h3.open::before { transform: rotate(90deg); }
+
+  /* ── Main content ── */
+  main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 40px 56px;
+    background: var(--bg);
+  }
+  main::-webkit-scrollbar { width: 8px; }
+  main::-webkit-scrollbar-thumb { background: #c0c0c0; border-radius: 4px; }
+  main::-webkit-scrollbar-thumb:hover { background: #999; }
+
+  #content {
+    max-width: 860px;
+    margin: 0 auto;
+    background: var(--content-bg);
+    border-radius: 8px;
+    padding: 48px 56px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+
+  /* ── Markdown styles ── */
+  #content h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--h1-color);
+    border-bottom: 3px solid #00B5E2;
+    padding-bottom: 12px;
+    margin: 0 0 28px;
+    letter-spacing: -.3px;
+  }
+  #content h2 {
+    font-size: 21px;
+    font-weight: 700;
+    color: var(--h2-color);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    margin: 40px 0 18px;
+  }
+  #content h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--h3-color);
+    margin: 28px 0 12px;
+  }
+  #content h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #071D49;
+    margin: 20px 0 8px;
+  }
+  #content p { line-height: 1.75; margin: 0 0 14px; color: #2a3a50; }
+  #content a { color: var(--link-color); text-decoration: none; }
+  #content a:hover { text-decoration: underline; }
+  #content strong { font-weight: 700; color: #071D49; }
+
+  #content ul, #content ol {
+    margin: 8px 0 16px 24px;
+    line-height: 1.8;
+  }
+  #content li { margin-bottom: 4px; color: #2a3a50; }
+  #content li > ul { margin-top: 4px; margin-bottom: 4px; }
+
+  #content code {
+    background: var(--code-bg);
+    border: 1px solid var(--code-border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+    font-size: 13px;
+    color: #005EB8;
+  }
+  #content pre {
+    background: #071D49;
+    border-radius: 8px;
+    padding: 20px 24px;
+    overflow-x: auto;
+    margin: 18px 0;
+    border-left: 4px solid #00B5E2;
+    box-shadow: inset 0 0 0 1px #0d2d6b;
+  }
+  #content pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #c8e8f8;
+    font-size: 13px;
+    line-height: 1.65;
+  }
+
+  #content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0;
+    font-size: 14px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+  #content th {
+    background: var(--table-header);
+    color: #071D49;
+    font-weight: 700;
+    padding: 11px 14px;
+    text-align: left;
+    border-bottom: 2px solid var(--table-border);
+  }
+  #content td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #e8f0f8;
+    color: #2a3a50;
+  }
+  #content tr:last-child td { border-bottom: none; }
+  #content tr:hover td { background: #f0f8fd; }
+
+  #content blockquote {
+    border-left: 4px solid #00B5E2;
+    background: #e0f4fb;
+    padding: 12px 18px;
+    margin: 18px 0;
+    border-radius: 0 6px 6px 0;
+    color: #071D49;
+    font-style: italic;
+  }
+
+  #content hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+
+  /* Toggle button */
+  #toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(255,255,255,.8);
+    padding: 4px 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: background .12s, color .12s;
+    margin-left: auto;
+  }
+  #toggle-btn:hover { background: rgba(255,255,255,.15); color: #fff; }
+
+  /* Progress bar */
+  #progress {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    height: 3px;
+    background: #00B5E2;
+    width: 0%;
+    z-index: 200;
+    transition: width .1s;
+    pointer-events: none;
+  }
+
+  @media (max-width: 700px) {
+    aside { width: 0; }
+    #content { padding: 28px 20px; }
+    main { padding: 20px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<header>
+  <!-- Book icon -->
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+  </svg>
+  <span>AI Agent &amp; Analytics Best Practice Playbook</span>
+  <button id="toggle-btn" title="Toggle sidebar">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/>
+    </svg>
+  </button>
+</header>
+
+<div class="layout">
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+      Table of Contents
+    </div>
+    <nav id="toc"></nav>
+  </aside>
+
+  <main id="main-scroll">
+    <div id="content"></div>
+  </main>
+</div>
+
+<script>
+const FALLBACK_MD = `# AI Agent & Analytics Best Practice Playbook
+
+## 1. Scope & Purpose
+
+This playbook provides a **practical, hands-on guide** for adopting and scaling in-house AI toolkits within the analytics team.
+
+It is designed to:
+
+* Accelerate onboarding to the AI/analytics tech stack
+* Standardize best practices across workflows
+* Enable business value delivery through AI-driven analytics
+
+## 2. Technology Stack Setup & Overview
+
+### 2.1 End-to-End Stack (High-Level)
+
+| Layer           | Tools                                      |
+| --------------- | ------------------------------------------ |
+| Development IDE | VS Code / JupyterLab                       |
+| Version Control | Azure Repos                                |
+| AI/LLM          | Claude + Iliad API                         |
+| Training        | Claude training materials                  |
+| Integration     | Unified workflow via local dev environment |
+
+📄 Reference:
+
+* [APEX Immunology Technology Stack & Strategy](https://abbvie.sharepoint.com/:p:/r/sites/APEX-AdvancedAnalyticsInnovation/Shared%20Documents/General/2026/APEX%20AI/APEX%20Immunology%20Technology%20Stack%20%26%20Strategy.pptx?web=1)
+
+**Summary:**
+Defines how all tooling integrates through a **dev environment**, enabling seamless interaction between code, data, and AI capabilities.
+
+### 2.2 Development Environment Setup
+
+Choose based on your workflow and preference. Both are fully supported.
+
+#### VS Code (local)
+Best for: code-heavy workflows, SSH/EMR remote development, Claude Code integration.
+
+📄 Reference:
+
+* [How to Install VS Code & Connect to EMR](https://abbvie.sharepoint.com/:w:/r/sites/APEX-AdvancedAnalyticsInnovation/Shared%20Documents/General/2026/APEX%20AI/How%20to%20Install%20VS%20Code%20%26%20Connect%20to%20EMR.docx?web=1)
+
+**Summary:**
+Step-by-step instructions for installing VS Code, configuring the SSH plugin to connect to a remote EMR master node, setting up a Jupyter notebook environment locally and remotely, and establishing a Spark session for running Spark queries within VS Code.
+
+#### JupyterLab (remote)
+Best for: notebook-first exploratory analytics, interactive data visualization, iterative EDA.
+
+### 2.3 Claude & API Integration
+
+📄 References:
+
+* [Claude Code & Iliad API Onboarding](https://abbvie.sharepoint.com/:p:/r/sites/APEX-AdvancedAnalyticsInnovation/Shared%20Documents/General/2026/APEX%20AI/Claude%20Code%20%26%20Iliad%20API%20Onboarding.pptx?web=1)
+* [Claude Training Deck](https://abbvie.sharepoint.com/:t:/r/sites/APEX-AdvancedAnalyticsInnovation/Shared%20Documents/General/2026/APEX%20AI/Claude%20training%20deck.md?web=1)
+
+**Summary:**
+
+* Covers onboarding to Claude and Iliad API
+* Provides hands-on training materials for real workflows
+* Enables embedding AI directly into dev pipelines
+
+### 2.4 Version Control: Azure Repos
+
+Azure Repos (via Azure DevOps) is the approved version control platform for AbbVie projects. It integrates with AbbVie AD/SSO and Azure Pipelines for CI/CD.
+
+📄 Reference:
+
+* [Azure Repos Onboarding](https://abbvie.sharepoint.com/:w:/r/sites/APEX-AdvancedAnalyticsInnovation/Shared%20Documents/General/2026/APEX%20AI/azuredevops_developer-userguide_v131_updated.docx?web=1)
+
+**Summary:**
+Provides **standard Azure Repos workflows and best practices** for collaboration, versioning, and reproducibility.
+
+### 2.5 Standard Workflow Pattern
+
+\`\`\`text
+1. Start in VS Code
+2. Pull project from Azure Repos
+3. Load dataset / pipeline
+4. Use AI agent (Claude) for:
+   - Code generation
+   - Debugging
+   - Documentation
+5. Validate outputs manually
+6. Commit back to Azure Repos
+\`\`\`
+
+## 3. AI Agent Usage Best Practices
+
+### 3.1 When to Use AI Agents
+
+Use Claude / AI tools for:
+
+* Code scaffolding (Python, SQL, APIs)
+* Debugging and troubleshooting
+* Documentation and summarization
+* Rapid prototyping
+
+Avoid using AI for:
+
+* Final validation of business-critical outputs
+* Replacing domain or statistical reasoning
+
+### 3.2 Effective Prompting Pattern
+
+\`\`\`text
+Context → Task → Constraints → Output format
+\`\`\`
+
+Example:
+
+\`\`\`text
+You are working with a healthcare analytics dataset.
+Task: Generate a feature pipeline for predicting payer restrictions.
+Constraints: Use pandas and keep it production-friendly.
+Output: Python code only.
+\`\`\`
+
+### 3.3 Human-in-the-Loop Validation
+
+Required checkpoints:
+
+* Validate data assumptions
+* Review generated code before deployment
+* Confirm business logic alignment
+
+## 4. Recommended Team Playbooks (Work in Progress)
+
+### 4.1 Starter Use Case Playbook
+
+* Use AI to:
+  * Generate SQL queries
+  * Build feature engineering pipelines
+  * Document datasets
+
+### 4.2 Advanced Use Case Playbook
+
+* Build reusable AI-assisted modules:
+  * Data quality validation scripts
+  * Automated insight generation
+  * Model diagnostics
+
+## 5. Adoption Strategy
+
+### 5.1 Phase-Based Rollout
+
+1. Individual experimentation
+2. Team-level use case validation
+3. Standardization of best practices
+4. Scaled adoption
+
+### 5.2 Success Metrics
+
+* Reduced time to deliver analysis
+* Increased code reproducibility
+* Improved onboarding speed
+* Tangible business impact (e.g., decision support)
+
+## 6. Key Takeaways for Analytics Team Members
+
+* AI is a **force multiplier**, not a replacement for core analytics skills
+* Start simple → scale with proven workflows
+* Anchor everything in **Azure Repos + Python + reproducible pipelines**
+* Use AI where it accelerates—not where it introduces risk
+* Learn from early adopters and reusable patterns
+
+## 7. Quick Start Checklist
+
+\`\`\`text
+☐ Set up development environment (VS Code or JupyterLab)
+☐ Set up Claude Code and Iliad API access
+☐ Clone repo from Azure Repos
+☐ Review onboarding decks
+☐ Run first AI-assisted workflow
+☐ Commit changes with best practices
+☐ Share learnings with team
+\`\`\`
+`;
+
+function render(md) {
+  document.getElementById('content').innerHTML = marked.parse(md);
+  document.querySelectorAll('#content a').forEach(a => {
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+  });
+  buildToc();
+}
+
+// ── Try fetch first; fall back to embedded content ──
+fetch('AI Agent & Analytics Best Practice Playbook.md')
+  .then(r => {
+    if (!r.ok) throw new Error(r.status);
+    return r.text();
+  })
+  .then(render)
+  .catch(() => render(FALLBACK_MD));
+
+function buildToc() {
+  const toc = document.getElementById('toc');
+  const headings = document.querySelectorAll('#content h1, #content h2, #content h3, #content h4');
+  const tocItems = [];
+
+  headings.forEach((h, i) => {
+    const id = 'heading-' + i;
+    h.id = id;
+    const level = parseInt(h.tagName[1]);
+    const a = document.createElement('a');
+    a.className = `toc-item toc-h${level}`;
+    a.textContent = h.textContent;
+    a.href = '#' + id;
+    a.dataset.level = level;
+
+    if (level >= 4) a.style.display = 'none';
+
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      if (level === 3) {
+        const wasOpen = a.classList.contains('open');
+        a.classList.toggle('open');
+        // show/hide following h4 siblings until next h1/h2/h3
+        let sib = a.nextElementSibling;
+        while (sib && sib.dataset.level >= 4) {
+          sib.style.display = wasOpen ? 'none' : '';
+          sib = sib.nextElementSibling;
+        }
+      }
+      h.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    toc.appendChild(a);
+    tocItems.push({ el: a, heading: h, level });
+  });
+
+  function expandParentH3(activeIdx) {
+    for (let i = activeIdx - 1; i >= 0; i--) {
+      if (tocItems[i].level <= 3) {
+        if (tocItems[i].level === 3 && !tocItems[i].el.classList.contains('open')) {
+          tocItems[i].el.classList.add('open');
+          let sib = tocItems[i].el.nextElementSibling;
+          while (sib && sib.dataset.level >= 4) {
+            sib.style.display = '';
+            sib = sib.nextElementSibling;
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  // ── Scroll spy ──
+  const scroller = document.getElementById('main-scroll');
+  const progress = document.getElementById('progress');
+
+  scroller.addEventListener('scroll', () => {
+    const { scrollTop, scrollHeight, clientHeight } = scroller;
+    const pct = scrollHeight > clientHeight
+      ? (scrollTop / (scrollHeight - clientHeight)) * 100
+      : 0;
+    progress.style.width = pct + '%';
+
+    let active = 0;
+    const offset = 80;
+    headings.forEach((h, i) => {
+      const rect = h.getBoundingClientRect();
+      const mainRect = scroller.getBoundingClientRect();
+      if (rect.top - mainRect.top <= offset) active = i;
+    });
+    tocItems.forEach((item, i) => {
+      item.el.classList.toggle('active', i === active);
+      if (i === active) {
+        if (item.level >= 4) expandParentH3(i);
+        item.el.scrollIntoView({ block: 'nearest' });
+      }
+    });
+  }, { passive: true });
+
+  // ── Sidebar toggle ──
+  const sidebar = document.getElementById('sidebar');
+  document.getElementById('toggle-btn').addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+  });
+}
+</script>
+</body>
+</html>
