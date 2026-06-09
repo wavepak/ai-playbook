@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <style>
   :root {
-    --sidebar-width: 260px;
+    --sidebar-width: 360px;
     --header-height: 48px;
     --bg: #f0f4f8;
     --sidebar-bg: #071D49;
@@ -357,11 +357,7 @@ It is designed to:
 | Version Control | Azure Repos                                |
 | AI/LLM          | Claude + Iliad API                         |
 | Training        | Claude training materials                  |
-| Integration     | Unified workflow via local dev environment |
-
-📄 Reference:
-
-* [APEX Immunology Technology Stack & Strategy](https://abbvie.sharepoint.com/:p:/r/sites/APEX-AdvancedAnalyticsInnovation/Shared%20Documents/General/2026/APEX%20AI/APEX%20Immunology%20Technology%20Stack%20%26%20Strategy.pptx?web=1)
+| Integration     | Unified workflow via dev environment       |
 
 **Summary:**
 Defines how all tooling integrates through a **dev environment**, enabling seamless interaction between code, data, and AI capabilities.
@@ -382,6 +378,13 @@ Step-by-step instructions for installing VS Code, configuring the SSH plugin to 
 
 #### JupyterLab (remote)
 Best for: notebook-first exploratory analytics, interactive data visualization, iterative EDA.
+
+📄 Reference:
+
+* [SMUS End User Guide v1](https://abbvie.sharepoint.com/:w:/r/sites/APEX-AdvancedAnalyticsInnovation/Shared%20Documents/General/2026/APEX%20AI/SMUS_End_User_Guide_v1.docx?web=1)
+
+**Summary:**
+Provides instructions for accessing the JupyterLab environment on SMUS, including how to connect, navigate the interface, and use it for model building/tracking, data analysis, and visualization.
 
 ### 2.3 Claude & API Integration
 
@@ -410,7 +413,7 @@ Provides **standard Azure Repos workflows and best practices** for collaboration
 ### 2.5 Standard Workflow Pattern
 
 \`\`\`text
-1. Start in VS Code
+1. Start in VS Code/JupyterLab
 2. Pull project from Azure Repos
 3. Load dataset / pipeline
 4. Use AI agent (Claude) for:
@@ -462,19 +465,31 @@ Required checkpoints:
 
 ## 4. Recommended Team Playbooks (Work in Progress)
 
-### 4.1 Starter Use Case Playbook
+AI-assisted analytics work typically follows two patterns: **starter workflows** (SQL generation, feature pipelines, dataset documentation) and **advanced workflows** (reusable modules, automated insight generation, model diagnostics). The playbooks below are team-specific examples built on these patterns.
 
-* Use AI to:
-  * Generate SQL queries
-  * Build feature engineering pipelines
-  * Document datasets
+### 4.1 MHI AI Agent
 
-### 4.2 Advanced Use Case Playbook
+A Claude Code-based AI agent built for the medical analytics workflow. It converts vague stakeholder requests into scoped action plans — surfacing clarifying questions, generating SQL outlines, and drafting stakeholder-ready findings — reducing a typical **~5-hour** request cycle to **~45 minutes**. Domain knowledge (channel canonicals, indication scope, compliance rules) is encoded as modular playbooks loaded on demand, ensuring output reflects MHI-specific logic rather than generic LLM reasoning.
 
-* Build reusable AI-assisted modules:
-  * Data quality validation scripts
-  * Automated insight generation
-  * Model diagnostics
+📄 Reference:
+
+* [MHI Agent Playbook](https://abbvie.sharepoint.com/:b:/r/sites/APEX-AdvancedAnalyticsInnovation/Shared%20Documents/General/2026/APEX%20AI/MHI%20Agent%20Playbook.pdf?web=1)
+
+### 4.2 Suggestion Holistic Analysis AI Agent
+
+An analytics agentic system that automates end-to-end analysis of prescription suggestion (eg. NBA) performance — combining rep engagement data (attribution), prescription outcomes (measurement), and 135+ theme mappings into a single holistic report in **~3 minutes**, down from **3 weeks** of manual work. Built on five Claude Code skills (Measurement Calculator, Attribution Calculator, Theme Mapping Engine, Holistic Analysis Engine, Knowledge Base Integration), it connects engagement signals to business impact across brands simultaneously. The knowledge base layer encodes BRDs, methodologies, and decision frameworks so outputs reflect team-specific logic, not generic analysis.
+
+📄 Reference:
+
+* [Suggestion Holistic Analysis AI Agent](https://abbvie.sharepoint.com/:u:/r/sites/APEX-AdvancedAnalyticsInnovation/Shared%20Documents/General/2026/APEX%20AI/suggestions_ai_project.html?web=1)
+
+### 4.3 Gastro Analytics AI Platform - COMPASS
+
+COMPASS is the GASTRO analytics platform that unifies five commercial data sources — in-play patient counts (PPTool), national and weekly prescription volumes, patient-level claims, and HCP prescriber trends — into a single, always-current view of Skyrizi and Rinvoq performance across UC and CD. The platform spans the full commercial funnel from market opportunity to individual prescriber, with modules for market share trending, competitive dynamics, patient flow, and field targeting. Its built-in AI assistant (ARIA) lets users ask business questions in plain English and returns both written analysis and visualizations, grounded in a GASTRO-specific domain knowledge base.
+
+📄 Reference:
+
+* [COMPASS Overview](https://abbvie.sharepoint.com/:t:/r/sites/APEX-AdvancedAnalyticsInnovation/Shared%20Documents/General/2026/APEX%20AI/COMPASS_Overview.md?web=1)
 
 ## 5. Adoption Strategy
 
