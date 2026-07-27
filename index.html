@@ -267,18 +267,25 @@
 
   /* Toggle button */
   #toggle-btn {
-    background: none;
-    border: none;
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,.1);
+    border: 1px solid rgba(255,255,255,.3);
     cursor: pointer;
-    color: rgba(255,255,255,.8);
-    padding: 4px 6px;
-    border-radius: 4px;
+    color: #fff;
+    padding: 6px;
+    border-radius: 7px;
     display: flex;
     align-items: center;
-    transition: background .12s, color .12s;
-    margin-left: auto;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background .12s, border-color .12s;
   }
-  #toggle-btn:hover { background: rgba(255,255,255,.15); color: #fff; }
+  #toggle-btn:hover {
+    background: rgba(255,255,255,.22);
+    border-color: rgba(255,255,255,.7);
+  }
+  #toggle-btn:focus-visible { outline: 3px solid #00B5E2; outline-offset: 2px; }
 
   /* Progress bar */
   #progress {
@@ -295,6 +302,7 @@
 
   @media (max-width: 700px) {
     aside { width: 0; }
+    aside:not(.collapsed) { width: min(85vw, var(--sidebar-width)); }
     #content { padding: 28px 20px; }
     main { padding: 20px 12px; }
   }
@@ -305,21 +313,21 @@
 <div id="progress"></div>
 
 <header>
+  <button id="toggle-btn" title="Toggle Table of Content" aria-label="Toggle Table of Content" aria-expanded="false" aria-controls="sidebar">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
   <!-- Book icon -->
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
     <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
   </svg>
   <span>AI Agent &amp; Analytics Best Practice Playbook</span>
-  <button id="toggle-btn" title="Toggle sidebar">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/>
-    </svg>
-  </button>
 </header>
 
 <div class="layout">
-  <aside id="sidebar">
+  <aside id="sidebar" class="collapsed">
     <div class="sidebar-header">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
@@ -335,7 +343,7 @@
 </div>
 
 <script>
-const FALLBACK_MD = `# AI Agent & Analytics Best Practice Playbook
+const LEGACY_FALLBACK_MD = `# AI Agent & Analytics Best Practice Playbook
 
 ## 1. Scope & Purpose
 
@@ -528,6 +536,174 @@ COMPASS is the GASTRO analytics platform that unifies five commercial data sourc
 \`\`\`
 `;
 
+const FALLBACK_MD = `# AI Agent & Analytics Best Practice Playbook
+
+## 1. Scope
+
+This playbook helps analytics team members use **Claude Code for agentic coding on local Windows**.
+
+### Currently not in scope
+
+- go/ai
+- AWS or remote development environments
+- JupyterLab or EMR setup
+- Unattended or autonomous execution
+
+## 2. Agentic Coding with Claude
+
+### What Claude Code Actually Is
+
+Claude Code is not just a chat window. It is an agent that works through a continuous **Read -> Decide -> Act -> Observe** loop:
+
+1. **Reads** - Opens files, searches code, and inspects the current state.
+2. **Decides** - Selects the next action from its available tools.
+3. **Acts** - Edits files, runs tests, or calls approved APIs.
+4. **Observes** - Reviews the result and uses it to decide what to do next.
+
+This loop allows Claude Code to complete multi-step tasks while you guide and validate its work.
+
+Follow the learning path in order. Start in PowerShell, move to VS Code, and then apply the workflow to a data science project.
+
+### 2.1 101: Hands-On CLI
+
+[Open Agentic Coding 101 - From Scratch](https://abbvie.sharepoint.com/:w:/r/sites/APEX-AdvancedAnalyticsInnovation/Shared%20Documents/General/Onboarding%20Resources/Software,%20Platforms,%20Data,%20%26%20Access/APEX%20AA%26I%20Agentic%20Coding%20101%20-%20From%20Scratch.docx?web=1)
+
+**Goal:** Learn the core Claude Code workflow in Windows PowerShell.
+
+1. Open PowerShell in a local project folder.
+2. Start Claude Code.
+3. Describe a small, specific task.
+4. Review the proposed approach and file changes.
+5. Run and validate the result yourself.
+
+Use this prompt structure:
+
+\`\`\`text
+Context: What Claude needs to know
+Task: What you want completed
+Constraints: Tools, rules, or boundaries
+Output: What the result should look like
+\`\`\`
+
+Example:
+
+\`\`\`text
+Context: This is a local Python project that analyzes prescription data.
+Task: Add a script that summarizes monthly prescription volume.
+Constraints: Use pandas and do not modify the source data.
+Output: Python code with brief run instructions.
+\`\`\`
+
+### 2.2 201: VS Code Extension
+
+[Open Agentic Coding 201 - VS Code Extension](https://abbvie.sharepoint.com/:w:/r/sites/APEX-AdvancedAnalyticsInnovation/Shared%20Documents/General/Onboarding%20Resources/Software,%20Platforms,%20Data,%20%26%20Access/APEX%20AA%26I%20Agentic%20Coding%20201%20-%20VS%20Code%20Extension.docx?web=1)
+
+**Goal:** Use Claude Code within VS Code.
+
+1. Open the local project folder in VS Code.
+2. Open the Claude Code extension.
+3. Give Claude one well-scoped task at a time.
+4. Inspect every proposed file change.
+5. Run the relevant code or tests before accepting the result.
+
+Use the extension when the task depends on several project files or when reviewing changes visually is easier than working in the CLI.
+
+### 2.3 301: Build a Data Science Project
+
+**Goal:** Apply agentic coding to a complete, reproducible local analysis.
+
+\`\`\`text
+Define the question
+    ↓
+Inspect the data and assumptions
+    ↓
+Ask Claude to plan
+    ↓
+Implement one step at a time
+    ↓
+Run and validate the analysis
+    ↓
+Document the method and results
+    ↓
+Commit reviewed changes
+\`\`\`
+
+Claude Code can help with:
+
+- Project scaffolding
+- Python and SQL drafting
+- Data exploration and visualization
+- Debugging and test creation
+- Documentation and summarization
+
+The analyst remains responsible for:
+
+- Data quality and permitted use
+- Statistical and business assumptions
+- Code review and validation
+- Final conclusions and decisions
+
+## 3. More to Explore
+
+<details>
+<summary title="Click to expand">Use cases and examples</summary>
+
+### MHI AI Agent
+
+Turns stakeholder requests into scoped plans, SQL outlines, and draft findings using MHI-specific playbooks.
+
+[Open the MHI Agent Playbook](https://abbvie.sharepoint.com/:b:/r/sites/APEX-AdvancedAnalyticsInnovation/Shared%20Documents/General/2026/APEX%20AI/MHI%20Agent%20Playbook.pdf?web=1)
+
+### Suggestion Holistic Analysis AI Agent
+
+Combines engagement, prescription outcomes, and theme mappings to automate suggestion-performance analysis.
+
+[Open the Suggestion Holistic Analysis AI Agent](https://abbvie.sharepoint.com/:u:/r/sites/APEX-AdvancedAnalyticsInnovation/Shared%20Documents/General/2026/APEX%20AI/suggestions_ai_project.html?web=1)
+
+### COMPASS
+
+Unifies GASTRO commercial data and uses ARIA to answer business questions with grounded analysis and visualizations.
+
+[Open the COMPASS overview](https://abbvie.sharepoint.com/:t:/r/sites/APEX-AdvancedAnalyticsInnovation/Shared%20Documents/General/2026/APEX%20AI/COMPASS_Overview.md?web=1)
+
+</details>
+<br>
+<details>
+<summary title="Click to expand">Best-practice reminders</summary>
+
+- Start with a small, verifiable task.
+- Ask Claude to inspect and plan before changing code.
+- Keep a human in the loop for every action.
+- Review generated code, commands, and outputs.
+- Never treat AI output as final business or statistical validation.
+- Keep projects reproducible with clear dependencies, documentation, and version control.
+
+</details>
+<br><details>
+<summary title="Click to expand">Other references</summary>
+
+- [Claude Deep Dive](https://abbvie.sharepoint.com/:t:/r/sites/APEX-AdvancedAnalyticsInnovation/Shared%20Documents/General/2026/APEX%20AI/Claude%20training%20deck.pdf?web=1)
+
+</details>
+
+## Quick Start
+
+- [ ] Complete the 101 PowerShell exercise.
+- [ ] Set up and try the VS Code extension.
+- [ ] Run one AI-assisted task in a local project.
+- [ ] Review and validate every change.
+- [ ] Document and commit the result.
+
+## Appendix A: Credits & Acknowledgments
+
+This playbook builds on the work and generosity of many across AbbVie.
+
+- **Kevin O'Donnell** — for content and guidance that shaped this playbook.
+- **And colleagues across AbbVie** whose materials, workflows, and early experiments informed what we built here — including the teams behind the MHI Agent, Suggestion Holistic Analysis, and COMPASS playbooks, and the authors of the onboarding and training resources referenced throughout.
+
+*If your contribution is missing here, let us know — this section is meant to grow.*
+`;
+
 function render(md) {
   document.getElementById('content').innerHTML = marked.parse(md);
   document.querySelectorAll('#content a').forEach(a => {
@@ -627,8 +803,10 @@ function buildToc() {
 
   // ── Sidebar toggle ──
   const sidebar = document.getElementById('sidebar');
-  document.getElementById('toggle-btn').addEventListener('click', () => {
+  const toggleButton = document.getElementById('toggle-btn');
+  toggleButton.addEventListener('click', () => {
     sidebar.classList.toggle('collapsed');
+    toggleButton.setAttribute('aria-expanded', String(!sidebar.classList.contains('collapsed')));
   });
 }
 </script>
